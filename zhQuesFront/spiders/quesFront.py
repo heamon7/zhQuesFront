@@ -17,7 +17,7 @@ class QuesfrontSpider(scrapy.Spider):
     name = "quesFront"
     allowed_domains = ["zhihu.com"]
     start_urls = ["http://www.zhihu.com/topic/19776749/questions"]
-
+    handle_httpstatus_list = [429]
 
 
     def parse(self, response):
@@ -26,7 +26,7 @@ class QuesfrontSpider(scrapy.Spider):
 
         requestUrls =[]
         startUrl = self.start_urls[0]
-        for index in range(0,5):
+        for index in range(1,50):
             page = startUrl + "?page=" + str(index)
             requestUrls.append(page)
 
@@ -35,28 +35,32 @@ class QuesfrontSpider(scrapy.Spider):
 
 
     def parsePage(self,response):
-        item = zhQuesItem()
-        for sel in response.xpath('//div[@id="zh-topic-questions-list"]//div[@itemprop="question"]'):
-            item['answerCount'] = int(sel.xpath('meta[@itemprop="answerCount"]/@content').extract()[0])
-            item['isTopQuestion'] = sel.xpath('meta[@itemprop="isTopQuestion"]/@content').extract()[0]
-            item['questionTimestamp'] = sel.xpath('h2[@class="question-item-title"]/span[@class="time"]/@data-timestamp').extract()[0]
-            item['questionLinkHref'] = sel.xpath('h2[@class="question-item-title"]/a[@class="question_link"]/@href').extract()[0]
-            item['questionName'] = sel.xpath('h2[@class="question-item-title"]/a[@class="question_link"]/text()').extract()[0]
-            try:
-                item['subTopicName'] = sel.xpath('div[@class="subtopic"]/a/text()').extract()[0]
-                item['subTopicHref'] = sel.xpath('div[@class="subtopic"]/a/@href').extract()[0]
+        if response.status != 200:
+            print "ParsePage HTTPStatusCode: %s Retrying !" %str(response.status)
+            yield Request(response.url,callback=self.parsePage)
+        else:
+            item = zhQuesItem()
+            for sel in response.xpath('//div[@id="zh-topic-questions-list"]//div[@itemprop="question"]'):
+                item['answerCount'] = int(sel.xpath('meta[@itemprop="answerCount"]/@content').extract()[0])
+                item['isTopQuestion'] = sel.xpath('meta[@itemprop="isTopQuestion"]/@content').extract()[0]
+                item['questionTimestamp'] = sel.xpath('h2[@class="question-item-title"]/span[@class="time"]/@data-timestamp').extract()[0]
+                items['questionLinkHref'] = sel.xpath('h2[@class="question-item-title"]/a[@class="question_link"]/@href').extract()[0]
+                item['questionName'] = sel.xpath('h2[@class="question-item-title"]/a[@class="question_link"]/text()').extract()[0]
+                try:
+                    item['subTopicName'] = sel.xpath('div[@class="subtopic"]/a/text()').extract()[0]
+                    item['subTopicHref'] = sel.xpath('div[@class="subtopic"]/a/@href').extract()[0]
 
-            except IndexError,e:
-                item['subTopicName'] = ''
-                item['subTopicHref'] = ''
-                log.msg("No subTopic question: "+item['questionLinkHref'],level=Warning)
+                except IndexError,e:
+                    item['subTopicName'] = ''
+                    item['subTopicHref'] = ''
+                    print "No subTopic question: %s" %item['questionLinkHref']
                 print e
             # item['link'] = sel.xpath('')
             # item['desc'] = sel.xpath('')
             # item['link'] = sel.xpath('')
             # item['link'] = sel.xpath('')
 
-            yield item
+                yield item
 
 
 

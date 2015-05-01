@@ -11,8 +11,8 @@
 BOT_NAME = 'zhQuesFront'
 
 
-CONCURRENT_REQUESTS = 100
-CONCURRENT_REQUESTS_PER_DOMAIN = 100
+CONCURRENT_REQUESTS = 50
+CONCURRENT_REQUESTS_PER_DOMAIN = 50
 
 SPIDER_MODULES = ['zhQuesFront.spiders']
 NEWSPIDER_MODULE = 'zhQuesFront.spiders'
@@ -24,3 +24,8 @@ ITEM_PIPELINES = {
     'zhQuesFront.pipelines.FirstPipline': 300,
    # 'zhihut.pipelines.SecondPipline': 800,
 }
+SPIDER_MIDDDLEWARES = {
+    'scrapy.contrib.spidermiddleware.httperror.HttpErrorMiddleware':300,
+}
+
+DUPEFILTER_CLASS = 'zhQuesFront.custom_filters.SeenURLFilter'
