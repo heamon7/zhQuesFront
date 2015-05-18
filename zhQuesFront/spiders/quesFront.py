@@ -54,7 +54,7 @@ class QuesfrontSpider(scrapy.Spider):
                     item['subTopicName'] = ''
                     item['subTopicHref'] = ''
              #       print "No subTopic question: %s" %item['questionLinkHref']
-              	    print e
+
             # item['link'] = sel.xpath('')
             # item['desc'] = sel.xpath('')
             # item['link'] = sel.xpath('')
