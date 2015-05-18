@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import os
 
-from scrapy.dupefilter import RFPDFilter
+from scrapy.dupefilter import RFPDupeFilter
 from scrapy.utils.request import request_fingerprint
 
-class SeenURLFilter(RFPDFilter):
+class SeenURLFilter(RFPDupeFilter):
     def __getid(self,url):
         return url
 

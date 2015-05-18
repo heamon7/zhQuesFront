@@ -10,6 +10,7 @@ from leancloud import Object
 from leancloud import LeanCloudError
 from leancloud import Query
 from scrapy import log
+from scrapy.exceptions import DropItem
 
 
 class FirstPipline(object):
@@ -19,9 +20,9 @@ class FirstPipline(object):
         #self.file = open('items.jl', 'wb')
 
     def process_item(self, item, spider):
-        TestQuestions = Object.extend('TestQuestions')
-        question = TestQuestions()
-        query = Query(TestQuestions)
+        Questions = Object.extend('Questions')
+        question = Questions()
+        query = Query(Questions)
         try:
             query.equal_to('questionLinkHref',item['questionLinkHref'])
 
@@ -34,12 +35,13 @@ class FirstPipline(object):
                 question.set('questionLinkHref',item['questionLinkHref'])
                 question.set('questionName',item['questionName'])
                 question.save()
-                print "Ssssssssssssssssaved!"
+                print "Question saved: %s" %item['questionLinkHref']
             else:
-                log.msg("Question existed: "+item['questionLinkHref'],level=log.INFO)
+#                print "Question existed: %s" %item['questionLinkHref']
+		pass
         except LeanCloudError,e:
             print e
         finally:
-            return item
+            DropItem()
 
 
