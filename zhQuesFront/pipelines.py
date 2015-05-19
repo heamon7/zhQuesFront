@@ -27,11 +27,12 @@ class FirstPipline(object):
             tableIndexStr = str(tableIndex)
         Question = Object.extend('Question' + tableIndexStr)
         question = Question()
-        query = Query(Question)
+#        query = Query(Question)
         try:
-            query.equal_to('questionLinkHref',item['questionLinkHref'])
+ #           query.equal_to('questionLinkHref',item['questionLinkHref'])
 
-            if not query.find():
+  #          if not query.find():
+	    if 1:
                 question.set('tableIndex',tableIndex)
                 question.set('answerCount',item['answerCount'])
                 question.set('isTopQuestion',item['isTopQuestion'])
@@ -41,9 +42,9 @@ class FirstPipline(object):
                 question.set('questionLinkHref',item['questionLinkHref'])
                 question.set('questionName',item['questionName'])
                 question.save()
-                print "Question saved: %s" %item['questionLinkHref']
+                #print "Question saved: %s" %item['questionLinkHref']
             else:
-#                print "Question existed: %s" %item['questionLinkHref']
+#               # print "Question existed: %s" %item['questionLinkHref']
 		pass
         except LeanCloudError,e:
             print e
