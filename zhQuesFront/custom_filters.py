@@ -15,4 +15,4 @@ class SeenURLFilter(RFPDupeFilter):
             return False    # Never do dupefilter
         self.fingerprints.add(fp)
         if self.file:
-            self.file.write(fp + of.linesep)
+            self.file.write(fp + os.linesep)

@@ -6,10 +6,14 @@ from scrapy.http import Request
 from scrapy.conf import settings
 
 from scrapy import log
+import leancloud
 
+from leancloud import Object
+from leancloud import LeanCloudError
+from leancloud import Query
 
 from zhQuesFront.items import zhQuesItem
-
+from zhQuesFront import settings
 
 rootTopicPageNum = 0
 
@@ -20,13 +24,21 @@ class QuesfrontSpider(scrapy.Spider):
     handle_httpstatus_list = [429]
 
 
+    def __init__(self,stats):
+        self.stats = stats
+        print "Initianizing ....."
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls(crawler.stats)
+
     def parse(self, response):
 
         rootTopicPageNum = int(response.xpath('//div[@class="border-pager"]//span[last()-1]/a/text()').extract()[0])
 
         requestUrls =[]
         startUrl = self.start_urls[0]
-        for index in range(1,rootTopicPageNum + 1):
+        for index in range(1,2 + 1):
             page = startUrl + "?page=" + str(index)
             requestUrls.append(page)
 
@@ -65,5 +77,20 @@ class QuesfrontSpider(scrapy.Spider):
 
 
 
+    def closed(self,reason):
+        #f = open('../../nohup.out')
+        #print f.read()
+        leancloud.init(settings.APP_ID, master_key=settings.MASTER_KEY)
 
+
+        CrawlerLog = Object.extend('CrawlerLog')
+        crawlerLog = CrawlerLog()
+
+        crawlerLog.set('crawlerName',self.name)
+        crawlerLog.set('closedReason',reason)
+        crawlerLog.set('crawlerStats',self.stats.get_stats())
+        try:
+            crawlerLog.save()
+        except:
+            pass
 

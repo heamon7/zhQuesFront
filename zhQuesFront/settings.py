@@ -21,6 +21,16 @@ NEWSPIDER_MODULE = 'zhQuesFront.spiders'
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'zhQuesFront (+http://www.yourdomain.com)'
 
+CACHE_SERVER_1 = 'd69c4508ccc94dc4.m.cnbjalinu16pub001.ocs.aliyuncs.com:11211'
+CACHE_USER_1 = 'd69c4508ccc94dc4'
+CACHE_PASSWORD_1 = 'Zhihucache1'
+
+# APP_ID_S = 'l72xkuuseu9sue0hn5xc0hhugw2ehalom2douyc0m8euw9og'
+# MASTER_KEY_S = 'znl8sbojk3ait7f4xjbmofsui540eqin4ilncmz5z0qvs8ko'
+
+APP_ID = 'l72xkuuseu9sue0hn5xc0hhugw2ehalom2douyc0m8euw9og'
+MASTER_KEY = 'znl8sbojk3ait7f4xjbmofsui540eqin4ilncmz5z0qvs8ko'
+
 ITEM_PIPELINES = {
     'zhQuesFront.pipelines.FirstPipline': 300,
    # 'zhihut.pipelines.SecondPipline': 800,
