@@ -28,8 +28,8 @@ CACHE_PASSWORD_1 = 'Zhihucache1'
 # APP_ID_S = 'l72xkuuseu9sue0hn5xc0hhugw2ehalom2douyc0m8euw9og'
 # MASTER_KEY_S = 'znl8sbojk3ait7f4xjbmofsui540eqin4ilncmz5z0qvs8ko'
 
-APP_ID = 'l72xkuuseu9sue0hn5xc0hhugw2ehalom2douyc0m8euw9og'
-MASTER_KEY = 'znl8sbojk3ait7f4xjbmofsui540eqin4ilncmz5z0qvs8ko'
+APP_ID = '8scc82ncveedyt6p8ilcz2auzoahzvpu2y800m5075f9flp9'
+MASTER_KEY = '06vseo6z44ummz0fgv0u6no7vnzqr4fbob0y2mxz6cv47p92'
 
 ITEM_PIPELINES = {
     'zhQuesFront.pipelines.FirstPipline': 300,

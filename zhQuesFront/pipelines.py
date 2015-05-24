@@ -55,7 +55,7 @@ class FirstPipline(object):
                     question.save()
                 except LeanCloudError,e:
                     print e
-            finally:
-                DropItem()
+
+        DropItem()
 
 

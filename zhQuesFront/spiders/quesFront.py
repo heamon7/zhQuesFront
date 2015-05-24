@@ -38,7 +38,7 @@ class QuesfrontSpider(scrapy.Spider):
 
         requestUrls =[]
         startUrl = self.start_urls[0]
-        for index in range(1,2 + 1):
+        for index in range(1,rootTopicPageNum + 1):
             page = startUrl + "?page=" + str(index)
             requestUrls.append(page)
 
