@@ -30,7 +30,7 @@ class FirstPipline(object):
         self.redis1 = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, password=settings.REDIS_USER+':'+settings.REDIS_PASSWORD,db=1)
     def process_item(self, item, spider):
         questionId = str(re.split('/question/',item['questionLinkHref'])[1])
-        if self.redis1.exists('questionId',str(questionId)):
+        if self.redis1.exists(str(questionId)):
             pass
         else:
             tableIndex = int(item['questionTimestamp']) % self.dbPrime
