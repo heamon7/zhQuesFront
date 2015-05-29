@@ -21,15 +21,20 @@ NEWSPIDER_MODULE = 'zhQuesFront.spiders'
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'zhQuesFront (+http://www.yourdomain.com)'
 
-CACHE_SERVER_1 = 'd69c4508ccc94dc4.m.cnbjalinu16pub001.ocs.aliyuncs.com:11211'
-CACHE_USER_1 = 'd69c4508ccc94dc4'
-CACHE_PASSWORD_1 = 'Zhihucache1'
+CACHE_SERVER_1 = '73670ac267c941e6.m.cnbjalinu16pub001.ocs.aliyuncs.com:11211'
+CACHE_USER_1 = '73670ac267c941e6'
+CACHE_PASSWORD_1 = 'Zhihu7773'
+
+CACHE_SERVER_2 = 'a840b6b1147f4b49.m.cnbjalinu16pub001.ocs.aliyuncs.com:11211'
+CACHE_USER_2 = 'a840b6b1147f4b49'
+CACHE_PASSWORD_2 = 'Zhihu7774'
+
 
 # APP_ID_S = 'l72xkuuseu9sue0hn5xc0hhugw2ehalom2douyc0m8euw9og'
 # MASTER_KEY_S = 'znl8sbojk3ait7f4xjbmofsui540eqin4ilncmz5z0qvs8ko'
 
-APP_ID = '8scc82ncveedyt6p8ilcz2auzoahzvpu2y800m5075f9flp9'
-MASTER_KEY = '06vseo6z44ummz0fgv0u6no7vnzqr4fbob0y2mxz6cv47p92'
+APP_ID = '8t1ezsjqdzyg2lavg78e1420tkhuo8xi7ahuo2tr0hai0tia'
+MASTER_KEY = 'gbesi4thlq92ocf5j7i608t7s69m3uzrovf6uctf3gwo52oy'
 
 ITEM_PIPELINES = {
     'zhQuesFront.pipelines.FirstPipline': 300,
