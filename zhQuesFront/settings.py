@@ -33,8 +33,8 @@ CACHE_PASSWORD_2 = 'Zhihu7774'
 # APP_ID_S = 'l72xkuuseu9sue0hn5xc0hhugw2ehalom2douyc0m8euw9og'
 # MASTER_KEY_S = 'znl8sbojk3ait7f4xjbmofsui540eqin4ilncmz5z0qvs8ko'
 
-APP_ID = '8t1ezsjqdzyg2lavg78e1420tkhuo8xi7ahuo2tr0hai0tia'
-MASTER_KEY = 'gbesi4thlq92ocf5j7i608t7s69m3uzrovf6uctf3gwo52oy'
+APP_ID = '041iof83iupmavqzsx3h6puivruvbhgbhhs8oenbfeo90e16'
+MASTER_KEY = 'mfr0kdf9iz20ackcpmodjwvzyty73fcwcpfmqd19x8kxy915'
 
 ITEM_PIPELINES = {
     'zhQuesFront.pipelines.FirstPipline': 300,
