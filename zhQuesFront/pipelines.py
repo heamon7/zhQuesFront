@@ -66,11 +66,15 @@ class FirstPipline(object):
             # questionInfoList.append(str(item['questionTimestamp']))
             # questionInfoList.append(str(re.split('/topic(\d*)',item['subTopicHref'])))
 
-
+            try:
+                subTopicId = re.split('/topic/(\d*)',item['subTopicHref'])[1]
+            except:
+                subTopicId =''
 
             p0 = self.redis1.pipeline()
             p0.incr('totalCount',1)
-            p0.rpush(str(questionId),int(questionIndex),int(tableIndexStr),int(item['questionTimestamp']),int(re.split('/topic/(\d*)',item['subTopicHref'])[1]))
+
+            p0.rpush(str(questionId),int(questionIndex),int(tableIndexStr),int(item['questionTimestamp']),int(subTopicId))
             p0.execute()
 
 
