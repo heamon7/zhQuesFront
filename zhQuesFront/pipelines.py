@@ -71,7 +71,7 @@ class FirstPipline(object):
             p0 = self.redis1.pipeline()
             p0.incr('totalCount',1)
             p0.rpush(str(questionId),int(questionIndex),int(tableIndexStr),int(item['questionTimestamp']),int(re.split('/topic/(\d*)',item['subTopicHref'])[1]))
-            p0.excuate()
+            p0.execute()
 
 
             try:
