@@ -69,7 +69,7 @@ class FirstPipline(object):
             try:
                 subTopicId = re.split('/topic/(\d*)',item['subTopicHref'])[1]
             except:
-                subTopicId =''
+                subTopicId =0
 
             p0 = self.redis1.pipeline()
             p0.incr('totalCount',1)
