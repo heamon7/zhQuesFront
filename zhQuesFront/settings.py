@@ -39,8 +39,8 @@ REDIS_PASSWORD = 'Zhihu777r'
 # APP_ID_S = 'l72xkuuseu9sue0hn5xc0hhugw2ehalom2douyc0m8euw9og'
 # MASTER_KEY_S = 'znl8sbojk3ait7f4xjbmofsui540eqin4ilncmz5z0qvs8ko'
 
-APP_ID = 'yr2v2mhdhoj0pidjx9lb7s6ggrm5664g27i14wj99mew9ow8'
-MASTER_KEY = 'hrawwmldmbt7m95ri7iith8rw50qrdhi6kuqyjdpltqwirs7'
+APP_ID = '782cqgjpjh4xyy9x1bvjeiohus580kytwc26k26r3swtuccc'
+MASTER_KEY = 'ly36pb4am9e5qzpakjaxao5pnhyeadv98v2yox8v64lkti30'
 
 ITEM_PIPELINES = {
     'zhQuesFront.pipelines.FirstPipline': 300,

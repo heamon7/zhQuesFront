@@ -21,7 +21,7 @@ class QuesfrontSpider(scrapy.Spider):
     name = "quesFront"
     allowed_domains = ["zhihu.com"]
     start_urls = ["http://www.zhihu.com/topic/19776749/questions"]
-    handle_httpstatus_list = [429]
+    handle_httpstatus_list = [429,504]
 
 
     def __init__(self,stats):

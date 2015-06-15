@@ -20,7 +20,7 @@ import re
 import redis
 
 class FirstPipline(object):
-    dbPrime = 97
+    dbPrime = 997
     def __init__(self):
         leancloud.init(settings.APP_ID, master_key=settings.MASTER_KEY)
         #self.file = open('items.jl', 'wb')
@@ -35,6 +35,8 @@ class FirstPipline(object):
         else:
             tableIndex = int(item['questionTimestamp']) % self.dbPrime
             if tableIndex < 10:
+                tableIndexStr = '00' + str(tableIndex)
+            elif tableIndex < 100:
                 tableIndexStr = '0' + str(tableIndex)
             else:
                 tableIndexStr = str(tableIndex)
@@ -43,11 +45,14 @@ class FirstPipline(object):
             question = Question()
 
             questionIndex = self.redis0.incr('totalCount',1)
-            self.redis0.hsetnx('questionIndex',str(questionIndex),  str(questionId))
+            p0= self.redis0.pipeline()
 
+            p0.hsetnx('questionIndex',str(questionIndex),  str(questionId))
+            p0.hsetnx('questionIdIndex',str(questionId),str(questionIndex))
+            p0.execute()
 
             question.set('questionId',str(questionId))
-            question.set('tableIndex',tableIndex)
+            question.set('tableIndexStr',tableIndexStr)
             question.set('answerCount',item['answerCount'])
             question.set('isTopQuestion',item['isTopQuestion'])
             question.set('subTopicName',item['subTopicName'])
@@ -71,11 +76,11 @@ class FirstPipline(object):
             except:
                 subTopicId =0
 
-            p0 = self.redis1.pipeline()
-            p0.incr('totalCount',1)
+            p1 = self.redis1.pipeline()
+            p1.incr('totalCount',1)
 
-            p0.rpush(str(questionId),int(questionIndex),int(tableIndexStr),int(item['questionTimestamp']),int(subTopicId))
-            p0.execute()
+            p1.rpush(str(questionId),int(questionIndex),int(tableIndexStr),int(item['questionTimestamp']),int(subTopicId))
+            p1.execute()
 
 
             try:
