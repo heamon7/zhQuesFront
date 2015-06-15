@@ -90,7 +90,7 @@ class FirstPipline(object):
                 try:
                     question.save()
                 except LeanCloudError,e:
-                    print e
+                    print "The exception is %s" %str(e)
 
         DropItem()
 
