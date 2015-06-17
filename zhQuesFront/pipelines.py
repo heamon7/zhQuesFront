@@ -70,8 +70,8 @@ class FirstPipline(object):
                                                'basic:subTopicName',item['subTopicName'],
                                                'basic:subTopicHref',item['subTopicHref'],
                                                'basic:quesTimestamp',item['questionTimestamp'],
-                                               'basic:quesnName',item['questionName'],
-                                               'basic:quesIndex',str(questionIndex)})
+                                               'basic:quesName',item['questionName'],
+                                               'basic:quesIndex',questionIndex})
 
 
             # questionInfoList =[]
