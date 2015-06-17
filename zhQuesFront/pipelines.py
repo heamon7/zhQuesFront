@@ -14,11 +14,10 @@ from scrapy.exceptions import DropItem
 
 from zhQuesFront import settings
 import time
-import bmemcached
 import re
 
 import redis
-
+import happybase
 class FirstPipline(object):
     dbPrime = 997
     def __init__(self):
@@ -28,21 +27,24 @@ class FirstPipline(object):
         # self.client2 = bmemcached.Client(settings.CACHE_SERVER_2,settings.CACHE_USER_2,settings.CACHE_PASSWORD_2)
         self.redis0 = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, password=settings.REDIS_USER+':'+settings.REDIS_PASSWORD,db=0)
         self.redis1 = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, password=settings.REDIS_USER+':'+settings.REDIS_PASSWORD,db=1)
+        connection = happybase.Connection(settings.HBASE_HOST)
+        self.questionTable = connection.table('question')
+
     def process_item(self, item, spider):
         questionId = str(re.split('/question/',item['questionLinkHref'])[1])
         if self.redis1.exists(str(questionId)):
             pass
         else:
-            tableIndex = int(item['questionTimestamp']) % self.dbPrime
-            if tableIndex < 10:
-                tableIndexStr = '00' + str(tableIndex)
-            elif tableIndex < 100:
-                tableIndexStr = '0' + str(tableIndex)
-            else:
-                tableIndexStr = str(tableIndex)
-
-            Question = Object.extend('Question' + tableIndexStr)
-            question = Question()
+            # tableIndex = int(item['questionTimestamp']) % self.dbPrime
+            # if tableIndex < 10:
+            #     tableIndexStr = '00' + str(tableIndex)
+            # elif tableIndex < 100:
+            #     tableIndexStr = '0' + str(tableIndex)
+            # else:
+            #     tableIndexStr = str(tableIndex)
+            #
+            # Question = Object.extend('Question' + tableIndexStr)
+            # question = Question()
 
             questionIndex = self.redis0.incr('totalCount',1)
             p0= self.redis0.pipeline()
@@ -51,18 +53,25 @@ class FirstPipline(object):
             p0.hsetnx('questionIdIndex',str(questionId),str(questionIndex))
             p0.execute()
 
-            question.set('questionId',str(questionId))
-            question.set('tableIndexStr',tableIndexStr)
-            question.set('answerCount',item['answerCount'])
-            question.set('isTopQuestion',item['isTopQuestion'])
-            question.set('subTopicName',item['subTopicName'])
-            question.set('subTopicHref',item['subTopicHref'])
-            question.set('questionTimestamp',item['questionTimestamp'])
-            question.set('questionLinkHref',item['questionLinkHref'])
-            question.set('questionName',item['questionName'])
-
-            question.set('questionIndex',str(questionIndex))
-
+            # question.set('questionId',str(questionId))
+            # # question.set('tableIndexStr',tableIndexStr)
+            # question.set('answerCount',item['answerCount'])
+            # question.set('isTopQuestion',item['isTopQuestion'])
+            # question.set('subTopicName',item['subTopicName'])
+            # question.set('subTopicHref',item['subTopicHref'])
+            # question.set('questionTimestamp',item['questionTimestamp'])
+            # # question.set('questionLinkHref',item['questionLinkHref'])
+            # question.set('questionName',item['questionName'])
+            #
+            # question.set('questionIndex',str(questionIndex))
+            self.questionTable.put(questionId,{'basic:quesId',questionId,
+                                               'basic:answerCount',item['answerCount'],
+                                               'basic:isTopQuestion',item['isTopQuestion'],
+                                               'basic:subTopicName',item['subTopicName'],
+                                               'basic:subTopicHref',item['subTopicHref'],
+                                               'basic:quesTimestamp',item['questionTimestamp'],
+                                               'basic:quesnName',item['questionName'],
+                                               'basic:quesIndex',str(questionIndex)})
 
 
             # questionInfoList =[]
@@ -79,18 +88,19 @@ class FirstPipline(object):
             p1 = self.redis1.pipeline()
             p1.incr('totalCount',1)
 
-            p1.rpush(str(questionId),int(questionIndex),int(tableIndexStr),int(item['questionTimestamp']),int(subTopicId))
+            # p1.rpush(str(questionId),int(questionIndex),int(tableIndexStr),int(item['questionTimestamp']),int(subTopicId))
+            p1.rpush(str(questionId),int(questionIndex),int(item['questionTimestamp']),int(subTopicId))
             p1.execute()
 
-
-            try:
-                question.save()
-
-            except LeanCloudError,e:
-                try:
-                    question.save()
-                except LeanCloudError,e:
-                    print "The exception is %s" %str(e)
+            #
+            # try:
+            #     question.save()
+            #
+            # except LeanCloudError,e:
+            #     try:
+            #         question.save()
+            #     except LeanCloudError,e:
+            #         print "The exception is %s" %str(e)
 
         DropItem()
 

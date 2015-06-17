@@ -6,11 +6,11 @@ from scrapy.http import Request
 from scrapy.conf import settings
 
 from scrapy import log
-import leancloud
-
-from leancloud import Object
-from leancloud import LeanCloudError
-from leancloud import Query
+# import leancloud
+#
+# from leancloud import Object
+# from leancloud import LeanCloudError
+# from leancloud import Query
 
 from zhQuesFront.items import zhQuesItem
 from zhQuesFront import settings
@@ -77,20 +77,20 @@ class QuesfrontSpider(scrapy.Spider):
 
 
 
-    def closed(self,reason):
-        #f = open('../../nohup.out')
-        #print f.read()
-        leancloud.init(settings.APP_ID, master_key=settings.MASTER_KEY)
-
-
-        CrawlerLog = Object.extend('CrawlerLog')
-        crawlerLog = CrawlerLog()
-
-        crawlerLog.set('crawlerName',self.name)
-        crawlerLog.set('closedReason',reason)
-        crawlerLog.set('crawlerStats',self.stats.get_stats())
-        try:
-            crawlerLog.save()
-        except:
-            pass
+    # def closed(self,reason):
+    #     #f = open('../../nohup.out')
+    #     #print f.read()
+    #     leancloud.init(settings.APP_ID, master_key=settings.MASTER_KEY)
+    #
+    #
+    #     CrawlerLog = Object.extend('CrawlerLog')
+    #     crawlerLog = CrawlerLog()
+    #
+    #     crawlerLog.set('crawlerName',self.name)
+    #     crawlerLog.set('closedReason',reason)
+    #     crawlerLog.set('crawlerStats',self.stats.get_stats())
+    #     try:
+    #         crawlerLog.save()
+    #     except:
+    #         pass
 
