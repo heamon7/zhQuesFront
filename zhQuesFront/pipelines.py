@@ -48,6 +48,10 @@ class FirstPipline(object):
 
             questionIndex = self.redis0.incr('totalCount',1)
             try:
+                subTopicId = re.split('/topic/(\d*)',item['subTopicHref'])[1]
+            except:
+                subTopicId =0
+            try:
                 self.questionTable.put(str(questionId),{'basic:quesId':str(questionId),
                                                'basic:answerCount':str(item['answerCount']),
                                                'basic:isTopQuestion':str(item['isTopQuestion']),
@@ -62,10 +66,7 @@ class FirstPipline(object):
                 p0.hsetnx('questionIdIndex',str(questionId),str(questionIndex))
                 p0.execute()
 
-                try:
-                    subTopicId = re.split('/topic/(\d*)',item['subTopicHref'])[1]
-                except:
-                    subTopicId =0
+
 
                 p1 = self.redis1.pipeline()
                 p1.incr('totalCount',1)
