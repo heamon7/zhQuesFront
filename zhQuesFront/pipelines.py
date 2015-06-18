@@ -46,7 +46,7 @@ class FirstPipline(object):
             # Question = Object.extend('Question' + tableIndexStr)
             # question = Question()
 
-            questionIndex = self.redis0.incr('totalCount',1)
+            questionIndex = str(self.redis0.incr('totalCount',1))
             p0= self.redis0.pipeline()
 
             p0.hsetnx('questionIndex',str(questionIndex),  str(questionId))
@@ -71,7 +71,7 @@ class FirstPipline(object):
                                                'basic:subTopicHref':str(item['subTopicHref']),
                                                'basic:quesTimestamp':str(item['questionTimestamp']),
                                                'basic:quesName':item['questionName'],
-                                               'basic:quesIndex':str(questionIndex)})
+                                               'basic:quesIndex':questionIndex})
 
 
             # questionInfoList =[]
