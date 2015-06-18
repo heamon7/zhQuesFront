@@ -67,10 +67,10 @@ class FirstPipline(object):
             self.questionTable.put(str(questionId),{'basic:quesId':str(questionId),
                                                'basic:answerCount':str(item['answerCount']),
                                                'basic:isTopQuestion':str(item['isTopQuestion']),
-                                               'basic:subTopicName':str(item['subTopicName']),
+                                               'basic:subTopicName':item['subTopicName'],
                                                'basic:subTopicHref':str(item['subTopicHref']),
                                                'basic:quesTimestamp':str(item['questionTimestamp']),
-                                               'basic:quesName':str(item['questionName']),
+                                               'basic:quesName':item['questionName'],
                                                'basic:quesIndex':str(questionIndex)})
 
 
