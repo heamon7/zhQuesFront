@@ -32,7 +32,7 @@ class FirstPipline(object):
 
     def process_item(self, item, spider):
         questionId = str(re.split('/question/',item['questionLinkHref'])[1])
-        if self.redis1.exists(str(questionId)):
+        if self.redis1.hexists('questionIdIndex',str(questionId)):
             pass
         else:
             # tableIndex = int(item['questionTimestamp']) % self.dbPrime
@@ -47,11 +47,38 @@ class FirstPipline(object):
             # question = Question()
 
             questionIndex = self.redis0.incr('totalCount',1)
-            p0= self.redis0.pipeline()
+            try:
+                self.questionTable.put(str(questionId),{'basic:quesId':str(questionId),
+                                               'basic:answerCount':str(item['answerCount']),
+                                               'basic:isTopQuestion':str(item['isTopQuestion']),
+                                               'basic:subTopicName':item['subTopicName'].encode('utf-8'),
+                                               'basic:subTopicId':str(subTopicId),
+                                               'basic:quesTimestamp':str(item['questionTimestamp']),
+                                               'basic:quesName':item['questionName'].encode('utf-8'),
+                                               'basic:quesIndex':str(questionIndex)})
 
-            p0.hsetnx('questionIndex',str(questionIndex),  str(questionId))
-            p0.hsetnx('questionIdIndex',str(questionId),str(questionIndex))
-            p0.execute()
+                p0= self.redis0.pipeline()
+                p0.hsetnx('questionIndex',str(questionIndex),  str(questionId))
+                p0.hsetnx('questionIdIndex',str(questionId),str(questionIndex))
+                p0.execute()
+
+                try:
+                    subTopicId = re.split('/topic/(\d*)',item['subTopicHref'])[1]
+                except:
+                    subTopicId =0
+
+                p1 = self.redis1.pipeline()
+                p1.incr('totalCount',1)
+
+                # p1.rpush(str(questionId),int(questionIndex),int(tableIndexStr),int(item['questionTimestamp']),int(subTopicId))
+                p1.rpush(str(questionId),int(questionIndex),int(item['questionTimestamp']),int(subTopicId))
+                p1.execute()
+            except Exception,e:
+                print e
+                print questionId
+                self.redis0.decr('totalCount',1)
+
+
 
             # question.set('questionId',str(questionId))
             # # question.set('tableIndexStr',tableIndexStr)
@@ -64,14 +91,7 @@ class FirstPipline(object):
             # question.set('questionName',item['questionName'])
             #
             # question.set('questionIndex',str(questionIndex))
-            self.questionTable.put(str(questionId),{'basic:quesId':str(questionId),
-                                               'basic:answerCount':str(item['answerCount']),
-                                               'basic:isTopQuestion':str(item['isTopQuestion']),
-                                               'basic:subTopicName':item['subTopicName'].encode('utf-8'),
-                                               'basic:subTopicHref':str(item['subTopicHref']),
-                                               'basic:quesTimestamp':str(item['questionTimestamp']),
-                                               'basic:quesName':item['questionName'].encode('utf-8'),
-                                               'basic:quesIndex':str(questionIndex)})
+
 
 
             # questionInfoList =[]
@@ -80,17 +100,7 @@ class FirstPipline(object):
             # questionInfoList.append(str(item['questionTimestamp']))
             # questionInfoList.append(str(re.split('/topic(\d*)',item['subTopicHref'])))
 
-            try:
-                subTopicId = re.split('/topic/(\d*)',item['subTopicHref'])[1]
-            except:
-                subTopicId =0
 
-            p1 = self.redis1.pipeline()
-            p1.incr('totalCount',1)
-
-            # p1.rpush(str(questionId),int(questionIndex),int(tableIndexStr),int(item['questionTimestamp']),int(subTopicId))
-            p1.rpush(str(questionId),int(questionIndex),int(item['questionTimestamp']),int(subTopicId))
-            p1.execute()
 
             #
             # try:

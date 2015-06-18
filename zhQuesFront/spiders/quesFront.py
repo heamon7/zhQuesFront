@@ -57,7 +57,11 @@ class QuesfrontSpider(scrapy.Spider):
                 item['isTopQuestion'] = sel.xpath('meta[@itemprop="isTopQuestion"]/@content').extract()[0]
                 item['questionTimestamp'] = sel.xpath('h2[@class="question-item-title"]/span[@class="time"]/@data-timestamp').extract()[0]
                 item['questionLinkHref'] = sel.xpath('h2[@class="question-item-title"]/a[@class="question_link"]/@href').extract()[0]
-                item['questionName'] = sel.xpath('h2[@class="question-item-title"]/a[@class="question_link"]/text()').extract()[0]
+
+                try:
+                    item['questionName'] = sel.xpath('h2[@class="question-item-title"]/a[@class="question_link"]/text()').extract()[0]
+                except IndexError,e:
+                    item['questionName'] = ''
                 try:
                     item['subTopicName'] = sel.xpath('div[@class="subtopic"]/a/text()').extract()[0]
                     item['subTopicHref'] = sel.xpath('div[@class="subtopic"]/a/@href').extract()[0]
