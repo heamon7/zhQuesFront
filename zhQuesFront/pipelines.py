@@ -64,14 +64,14 @@ class FirstPipline(object):
             # question.set('questionName',item['questionName'])
             #
             # question.set('questionIndex',str(questionIndex))
-            self.questionTable.put(questionId,{'basic:quesId',questionId,
-                                               'basic:answerCount',item['answerCount'],
-                                               'basic:isTopQuestion',item['isTopQuestion'],
-                                               'basic:subTopicName',item['subTopicName'],
-                                               'basic:subTopicHref',item['subTopicHref'],
-                                               'basic:quesTimestamp',item['questionTimestamp'],
-                                               'basic:quesName',item['questionName'],
-                                               'basic:quesIndex',questionIndex})
+            self.questionTable.put(str(questionId),{'basic:quesId':str(questionId),
+                                               'basic:answerCount':str(item)['answerCount'],
+                                               'basic:isTopQuestion':str(item['isTopQuestion']),
+                                               'basic:subTopicName':str(item['subTopicName']),
+                                               'basic:subTopicHref':str(item['subTopicHref']),
+                                               'basic:quesTimestamp':str(item['questionTimestamp']),
+                                               'basic:quesName':str(item['questionName']),
+                                               'basic:quesIndex':str(questionIndex)})
 
 
             # questionInfoList =[]
