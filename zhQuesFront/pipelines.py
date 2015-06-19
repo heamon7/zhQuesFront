@@ -32,7 +32,7 @@ class FirstPipline(object):
 
     def process_item(self, item, spider):
         questionId = str(re.split('/question/',item['questionLinkHref'])[1])
-        if self.redis1.hexists('questionIdIndex',str(questionId)):
+        if self.redis0.hexists('questionIdIndex',str(questionId)):
             pass
         else:
             # tableIndex = int(item['questionTimestamp']) % self.dbPrime
