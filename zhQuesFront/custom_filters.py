@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 
-from scrapy.dupefilter import RFPDupeFilter
+from scrapy.dupefilters import RFPDupeFilter
 from scrapy.utils.request import request_fingerprint
 
 class SeenURLFilter(RFPDupeFilter):

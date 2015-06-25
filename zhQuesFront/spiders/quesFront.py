@@ -5,7 +5,7 @@ from scrapy.selector import HtmlXPathSelector
 from scrapy.http import Request
 # from scrapy.conf import settings
 
-from scrapy import log
+import logging
 
 import redis
 import requests
@@ -32,9 +32,9 @@ class QuesfrontSpider(scrapy.Spider):
         totalLength = int(response.xpath('//div[@class="border-pager"]//span[last()-1]/a/text()').extract()[0])
         self.requestPageList = range(1,totalLength+1)
         if self.spider_type=='Master':
-            log.msg('Master spider_type is '+self.spider_type,level=log.WARNING)
+            logging.warning('Master spider_type is '+self.spider_type)
             if self.partition!=1:
-                log.msg('Master non 1 partition is '+str(self.partition),level=log.WARNING)
+                logging.warning('Master non 1 partition is '+str(self.partition))
                 self.requestPageList = self.requestPageList[self.spider_number*totalLength/self.partition:(self.spider_number+1)*totalLength/self.partition]
 
                 for index in range(1,self.partition):
@@ -46,15 +46,15 @@ class QuesfrontSpider(scrapy.Spider):
                         ,'partition':self.partition
                         ,'setting':'JOBDIR=/tmp/scrapy/'+self.name+str(index)
                     }
-                    log.msg('Begin to request'+str(index),level=log.WARNING)
+                    logging.warning('Begin to request'+str(index))
                     response = requests.post('http://'+settings.SCRAPYD_HOST_LIST[index]+':'+settings.SCRAPYD_PORT+'/schedule.json',data=payload)
-                    log.msg('Response: '+str(index)+' '+str(response),level=log.WARNING)
+                    logging.warning('Response: '+str(index)+' '+str(response))
             else:
-                log.msg('Master  partition is '+str(self.partition),level=log.WARNING)
+                logging.warning('Master  partition is '+str(self.partition))
 
         elif self.spider_type =='Slave':
-            log.msg('Slave spider_type is '+self.spider_type,level=log.WARNING)
-            log.msg('Slave number is '+str(self.spider_number) + ' partition is '+str(self.partition),level=log.WARNING)
+            logging.warning('Slave spider_type is '+self.spider_type)
+            logging.warning('Slave number is '+str(self.spider_number) + ' partition is '+str(self.partition))
             if (self.partition-self.spider_number)!=1:
                 self.requestPageList = self.requestPageList[self.spider_number*totalLength/self.partition:(self.spider_number+1)*totalLength/self.partition]
 
@@ -62,10 +62,10 @@ class QuesfrontSpider(scrapy.Spider):
                 self.requestPageList = self.requestPageList[self.spider_number*totalLength/self.partition:]
 
         else:
-            log.msg('spider_type is:'+str(self.spider_type)+'with type of '+str(type(self.spider_type)),level=log.ERROR)
+            logging.warning('spider_type is:'+str(self.spider_type)+'with type of '+str(type(self.spider_type)))
 
-        log.msg('start_requests ing ......',level=log.WARNING)
-        log.msg('totalCount to request is :'+str(len(self.requestPageList)),level=log.WARNING)
+        logging.warning('start_requests ing ......')
+        logging.warning('totalCount to request is :'+str(len(self.requestPageList)))
 
         requestUrls =[]
         startUrl = self.start_urls[0]
@@ -112,10 +112,10 @@ class QuesfrontSpider(scrapy.Spider):
 
         if int(self.partition)==int(finishedCount):
             payload=settings.NEXT_SCHEDULE_PAYLOAD
-            log.msg('Begin to request next schedule',level=log.WARNING)
+            logging.warning('Begin to request next schedule')
             response = requests.post('http://'+settings.NEXT_SCHEDULE_SCRAPYD_HOST+':'+settings.NEXT_SCHEDULE_SCRAPYD_PORT+'/schedule.json',data=payload)
-            log.msg('Response: '+' '+str(response),level=log.WARNING)
-        log.msg('finished close.....',level=log.WARNING)
+            logging.warning('Response: '+' '+str(response))
+        logging.warning('finished close.....')
 
 
 

@@ -32,5 +32,6 @@ CONCURRENT_REQUESTS_PER_DOMAIN = 70
 UPDATE_PERIOD = '864000' #最快10天更新一次
 EXTENSIONS = {
     'scrapy.contrib.feedexport.FeedExporter': None,
+    'scrapy.extensions.feedexport.FeedExporter': None
 }
 

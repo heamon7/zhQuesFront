@@ -5,19 +5,15 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 
-import leancloud
-from leancloud import Object
-from leancloud import LeanCloudError
-from leancloud import Query
-from scrapy import log
+import logging
 from scrapy.exceptions import DropItem
 
 from zhQuesFront import settings
 import time
 import re
-
 import redis
 import happybase
+
 class FirstPipline(object):
     # dbPrime = 997
     def __init__(self):
@@ -76,7 +72,7 @@ class FirstPipline(object):
                                                            'basic:quesName':item['questionName'].encode('utf-8'),
                                                            'basic:quesIndex':str(questionIndex)})
                     except Exception,e:
-                        log.msg('Error with put questionId into hbase: '+str(e)+' try again......',level=log.ERROR)
+                        logging.warning('Error with put questionId into hbase: '+str(e)+' try again......')
                         try:
                             self.questionTable.put(str(item['questionId']),{'basic:quesId':str(item['questionId']),
                                                        'basic:answerCount':str(item['answerCount']),
@@ -86,13 +82,13 @@ class FirstPipline(object):
                                                        'basic:quesTimestamp':str(item['questionTimestamp']),
                                                        'basic:quesName':item['questionName'].encode('utf-8'),
                                                        'basic:quesIndex':str(questionIndex)})
-                            log.msg(' tried again and successfully put data into hbase ......',level=log.ERROR)
+                            logging.warning(' tried again and successfully put data into hbase ......')
                         except Exception,e:
-                            log.msg('Error with put questionId into hbase: '+str(e)+'tried again and failed',level=log.ERROR)
+                            logging.warning('Error with put questionId into hbase: '+str(e)+'tried again and failed')
                     #更新记录的时间戳
                     self.redis1.lset(str(item['questionId']),0,str(recordTimestamp))
             except Exception,e:
-                log.msg('Error in try 0 with exception: '+str(e),level=log.ERROR)
+                logging.warning('Error in try 0 with exception: '+str(e))
 
             #解除锁
             self.redis0.hdel('questionLock',str(item['questionId']))
