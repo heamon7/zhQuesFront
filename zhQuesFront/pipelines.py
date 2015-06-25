@@ -19,66 +19,84 @@ import re
 import redis
 import happybase
 class FirstPipline(object):
-    dbPrime = 997
+    # dbPrime = 997
     def __init__(self):
-        leancloud.init(settings.APP_ID, master_key=settings.MASTER_KEY)
-        #self.file = open('items.jl', 'wb')
-        # self.client1 = bmemcached.Client(settings.CACHE_SERVER_1,settings.CACHE_USER_1,settings.CACHE_PASSWORD_1)
-        # self.client2 = bmemcached.Client(settings.CACHE_SERVER_2,settings.CACHE_USER_2,settings.CACHE_PASSWORD_2)
-        self.redis0 = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, password=settings.REDIS_USER+':'+settings.REDIS_PASSWORD,db=0)
-        self.redis1 = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, password=settings.REDIS_USER+':'+settings.REDIS_PASSWORD,db=1)
+        self.redis0 = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, password=settings.REDIS_PASSWORD,db=0)
+        self.redis1 = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, password=settings.REDIS_PASSWORD,db=1)
         connection = happybase.Connection(settings.HBASE_HOST)
         self.questionTable = connection.table('question')
 
     def process_item(self, item, spider):
-        questionId = str(re.split('/question/',item['questionLinkHref'])[1])
-        if self.redis0.hexists('questionIdIndex',str(questionId)):
-            pass
-        else:
-            # tableIndex = int(item['questionTimestamp']) % self.dbPrime
-            # if tableIndex < 10:
-            #     tableIndexStr = '00' + str(tableIndex)
-            # elif tableIndex < 100:
-            #     tableIndexStr = '0' + str(tableIndex)
-            # else:
-            #     tableIndexStr = str(tableIndex)
-            #
-            # Question = Object.extend('Question' + tableIndexStr)
-            # question = Question()
 
-            questionIndex = self.redis0.incr('totalCount',1)
+        #保证此次操作的原子性,其实如果是分布式的话，因为有分割，应该是不会冲突的，但是随着时间的增加还是有可能交叉
+        #如果正在更新当前这个问题的data ：
+        if  self.redis0.hsetnx('questionLock',str(item['questionId']),1):
+            #使用try，是为了确保锁会被解除。
             try:
-                subTopicId = re.split('/topic/(\d*)',item['subTopicHref'])[1]
-            except:
-                subTopicId =0
-            try:
-                self.questionTable.put(str(questionId),{'basic:quesId':str(questionId),
-                                               'basic:answerCount':str(item['answerCount']),
-                                               'basic:isTopQuestion':str(item['isTopQuestion']),
-                                               'basic:subTopicName':item['subTopicName'].encode('utf-8'),
-                                               'basic:subTopicId':str(subTopicId),
-                                               'basic:quesTimestamp':str(item['questionTimestamp']),
-                                               'basic:quesName':item['questionName'].encode('utf-8'),
-                                               'basic:quesIndex':str(questionIndex)})
+                currentTimestamp = int(time.time())
+
+                result = self.redis1.lrange(str(item['questionId']),0,1)
+                if result:
+                    [recordTimestamp,questionIndex]=result
+                else:
+                    [recordTimestamp,questionIndex]=('','')
 
                 p0= self.redis0.pipeline()
-                p0.hsetnx('questionIndex',str(questionIndex),  str(questionId))
-                p0.hsetnx('questionIdIndex',str(questionId),str(questionIndex))
-                p0.execute()
-
-
-
                 p1 = self.redis1.pipeline()
-                p1.incr('totalCount',1)
+                if not recordTimestamp:
+                    questionIndex = self.redis0.incr('totalCount',1)
 
-                # p1.rpush(str(questionId),int(questionIndex),int(tableIndexStr),int(item['questionTimestamp']),int(subTopicId))
-                p1.rpush(str(questionId),int(questionIndex),int(item['questionTimestamp']),int(subTopicId))
-                p1.execute()
+                    p0.hsetnx('questionIndex'
+                              ,str(questionIndex)
+                              ,str(item['questionId']))
+                    p0.hsetnx('questionIdIndex'
+                              ,str(item['questionId'])
+                              ,str(questionIndex))
+                    p0.execute()
+
+                    p1.incr('totalCount',1)
+                    p1.lpush(str(item['questionId'])
+                                 ,str(item['questionTimestamp'])
+                                 ,str(item['subTopicId'])
+                                 ,str(questionIndex)
+                                 ,str(recordTimestamp))
+                    p1.execute()
+
+                isTopQuestion = 1 if item['isTopQuestion'] == 'true' else 0
+                # 为了防止第一次插入数据库失败，需要以后有更新操作，这里更新时间可以设置长一些
+                if not recordTimestamp or (int(currentTimestamp)-int(recordTimestamp) > int(settings.UPDATE_PERIOD)):        # the latest record time in hbase
+                    recordTimestamp = currentTimestamp
+                    try:
+                        self.questionTable.put(str(item['questionId']),{'basic:quesId':str(item['questionId']),
+                                                           'basic:answerCount':str(item['answerCount']),
+                                                           'basic:isTopQues':str(isTopQuestion),
+                                                           'basic:subTopicName':item['subTopicName'].encode('utf-8'),
+                                                           'basic:subTopicId':str(item['subTopicId']),
+                                                           'basic:quesTimestamp':str(item['questionTimestamp']),
+                                                           'basic:quesName':item['questionName'].encode('utf-8'),
+                                                           'basic:quesIndex':str(questionIndex)})
+                    except Exception,e:
+                        log.msg('Error with put questionId into hbase: '+str(e)+' try again......',level=log.ERROR)
+                        try:
+                            self.questionTable.put(str(item['questionId']),{'basic:quesId':str(item['questionId']),
+                                                       'basic:answerCount':str(item['answerCount']),
+                                                       'basic:isTopQues':str(isTopQuestion),
+                                                       'basic:subTopicName':item['subTopicName'].encode('utf-8'),
+                                                       'basic:subTopicId':str(item['subTopicId']),
+                                                       'basic:quesTimestamp':str(item['questionTimestamp']),
+                                                       'basic:quesName':item['questionName'].encode('utf-8'),
+                                                       'basic:quesIndex':str(questionIndex)})
+                            log.msg(' tried again and successfully put data into hbase ......',level=log.ERROR)
+                        except Exception,e:
+                            log.msg('Error with put questionId into hbase: '+str(e)+'tried again and failed',level=log.ERROR)
+                    #更新记录的时间戳
+                    self.redis1.lset(str(item['questionId']),0,str(recordTimestamp))
             except Exception,e:
-                print e
-                print questionId
-                self.redis0.decr('totalCount',1)
+                log.msg('Error in try 0 with exception: '+str(e),level=log.ERROR)
 
+            #解除锁
+            self.redis0.hdel('questionLock',str(item['questionId']))
+        DropItem()
 
 
             # question.set('questionId',str(questionId))
@@ -113,6 +131,5 @@ class FirstPipline(object):
             #     except LeanCloudError,e:
             #         print "The exception is %s" %str(e)
 
-        DropItem()
 
 

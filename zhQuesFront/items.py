@@ -14,9 +14,9 @@ class zhQuesItem(scrapy.Item):
     answerCount = scrapy.Field()
     isTopQuestion = scrapy.Field()
     subTopicName = scrapy.Field()
-    subTopicHref = scrapy.Field()
+    subTopicId = scrapy.Field()
     questionTimestamp = scrapy.Field()
-    questionLinkHref = scrapy.Field()
+    questionId = scrapy.Field()
     questionName = scrapy.Field()
 
     # link = scrapy.Field()
